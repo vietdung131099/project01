@@ -1,0 +1,75 @@
+CREATE DATABASE shop_java CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+use shop_java;
+
+create table category
+(
+    id   int auto_increment
+        primary key,
+    name varchar(255) null
+);
+
+create table product
+(
+    id          int auto_increment
+        primary key,
+    name        varchar(255) null,
+    description text         null,
+    thumbnail   varchar(255) null,
+    price       mediumtext   null,
+    category_id int,
+    FOREIGN KEY (category_id) REFERENCES category(id)
+);
+
+create table role
+(
+    id          int auto_increment
+        primary key,
+    name        varchar(255) null,
+    description varchar(255) null
+);
+
+create table user
+(
+    id           int auto_increment
+        primary key,
+    user_name    varchar(50)                             not null,
+    password     varchar(50)                             not null,
+    name         varchar(50)                             null,
+    address      varchar(50)                             null,
+    phone        varchar(20)                             null,
+    email        varchar(50)                             null,
+    birthday     timestamp default CURRENT_TIMESTAMP     not null on update CURRENT_TIMESTAMP,
+    created_by   varchar(50)                             null,
+    created_date timestamp default '0000-00-00 00:00:00' not null,
+    constraint username
+        unique (user_name)
+);
+
+create table permission
+(
+    user_id int null,
+    role_id int null,
+    constraint permission_ibfk_1
+        foreign key (user_id) references user (id),
+    constraint permission_ibfk_2
+        foreign key (role_id) references role (id)
+);
+
+create index role_id
+    on permission (role_id);
+
+create index user_id
+    on permission (user_id);
+
+
+
+create table cart
+(
+    id          int auto_increment
+        primary key,
+    product_id int,
+    user_id int,
+    FOREIGN KEY (product_id) REFERENCES product(id),
+    FOREIGN KEY (user_id) REFERENCES user(id)
+)
