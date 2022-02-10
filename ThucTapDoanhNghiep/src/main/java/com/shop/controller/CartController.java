@@ -7,6 +7,7 @@ import com.shop.repositories.CartRepository;
 import com.shop.repositories.ProductRepository;
 import com.shop.utils.SessionUtils;
 
+import java.util.concurrent.atomic.AtomicLong;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -37,14 +38,17 @@ public class CartController extends BaseController{
         List<CartDisplayRequest> products = cartRepository.showInCart(userId).collect(Collectors.toList());
 
         List<String> listStringPrice = products.stream().map(t->t.getPrice()).collect(Collectors.toList()); // vì trong database giá là để String
-        List<Long> price = listStringPrice.stream().map(t->Long.parseLong(t)).collect(Collectors.toList());
-        long total = 0;  // tổng tiền
-        for(int i=0;i<price.size();i++){
-            total += price.get(i);
-        }
-
+//        List<Long> price = listStringPrice.stream().map(t->Long.parseLong(t)).collect(Collectors.toList());
+//        long total = 0;  // tổng tiền
+//        for(int i=0;i<price.size();i++){
+//            total += price.get(i);
+//        }
+        AtomicLong total = new AtomicLong();
+        listStringPrice.forEach(t-> {
+            total.addAndGet(Long.parseLong(t));
+        });
         req.setAttribute("tamtinh",total);
-        req.setAttribute("tongtien",total+25000);
+        req.setAttribute("tongtien",total.addAndGet(25000));
         req.setAttribute("products",products);
         rs.forward(req,resp);
     }
